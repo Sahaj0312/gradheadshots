@@ -23,6 +23,12 @@ import {
 } from "@/components/ui/card";
 import { Loader2, Upload, Download } from "lucide-react";
 import Image from "next/image";
+import * as fal from "@fal-ai/serverless-client";
+
+// Configure fal client with the API key
+fal.config({
+  credentials: process.env.NEXT_PUBLIC_FAL_KEY,
+});
 
 export default function Dashboard() {
   const [user, setUser] = useState(auth.currentUser);
@@ -61,16 +67,41 @@ export default function Dashboard() {
     }
   };
 
+  const generateImage = async () => {
+    console.log("Generating image");
+    setIsGenerating(true);
+    try {
+      const result = (await fal.subscribe("fal-ai/flux-lora", {
+        input: {
+          prompt:
+            'Extreme close-up of a single tiger eye, direct frontal view. Detailed iris and pupil. Sharp focus on eye texture and color. Natural lighting to capture authentic eye shine and depth. The word "FLUX" is painted over it in big, white brush strokes with visible texture.',
+          image_size: "landscape_4_3",
+        },
+        logs: true,
+        onQueueUpdate: (update) => {
+          if (update.status === "IN_PROGRESS") {
+            update.logs.map((log) => log.message).forEach(console.log);
+          }
+        },
+      })) as any;
+
+      if ((result as any).images && (result as any).images.length > 0) {
+        setGeneratedImageUrl((result as any).images[0].url);
+      } else {
+        console.error("No image generated");
+      }
+    } catch (error) {
+      console.error("Error generating image:", error);
+    } finally {
+      setIsGenerating(false);
+    }
+  };
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (step === 2) {
       setStep(3);
-      setIsGenerating(true);
-      // Simulate image generation
-      setTimeout(() => {
-        setIsGenerating(false);
-        setGeneratedImageUrl("/placeholder.svg?height=300&width=300");
-      }, 3000);
+      generateImage();
     } else {
       setStep(step + 1);
     }
@@ -246,14 +277,21 @@ export default function Dashboard() {
                     </div>
                   ) : (
                     <div className="space-y-4">
-                      <img
-                        src={generatedImageUrl}
-                        alt="Generated"
-                        className="w-full h-auto rounded-lg shadow-md"
-                      />
+                      {generatedImageUrl && (
+                        <div className="relative w-full h-64">
+                          <Image
+                            src={generatedImageUrl}
+                            alt="Generated"
+                            layout="fill"
+                            objectFit="cover"
+                            className="rounded-lg"
+                          />
+                        </div>
+                      )}
                       <Button
                         className="w-full bg-purple-600 hover:bg-purple-700 text-white"
                         onClick={() => window.open(generatedImageUrl, "_blank")}
+                        disabled={!generatedImageUrl}
                       >
                         <Download className="mr-2 h-4 w-4" /> Download Generated
                         Picture
