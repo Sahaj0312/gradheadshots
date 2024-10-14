@@ -30,6 +30,20 @@ fal.config({
   credentials: process.env.NEXT_PUBLIC_FAL_KEY,
 });
 
+const universitySashColors = {
+  university_of_toronto: "royal blue",
+  university_of_british_columbia: "gold",
+  mcgill_university: "red",
+  university_of_waterloo: "yellow",
+  university_of_alberta: "green",
+  mcmaster_university: "maroon",
+  university_of_montreal: "light blue",
+  queens_university: "dark red",
+  simon_fraser_university: "burgundy",
+  western_university: "purple",
+  other: "white",
+};
+
 export default function Dashboard() {
   const [user, setUser] = useState(auth.currentUser);
   const router = useRouter();
@@ -71,11 +85,22 @@ export default function Dashboard() {
     console.log("Generating image");
     setIsGenerating(true);
     try {
+      const sashColor =
+        universitySashColors[university as keyof typeof universitySashColors] ||
+        "yellow";
       const result = (await fal.subscribe("fal-ai/flux-lora", {
         input: {
-          prompt:
-            'Extreme close-up of a single tiger eye, direct frontal view. Detailed iris and pupil. Sharp focus on eye texture and color. Natural lighting to capture authentic eye shine and depth. The word "FLUX" is painted over it in big, white brush strokes with visible texture.',
+          prompt: `Portrait of a confident ${
+            gender === "female" ? "female" : "male"
+          } graduate, directly facing camera with a genuine warm smile, wearing traditional blue graduation cap with tassel and flowing black academic gown and a ${sashColor} sash, posed in classic yearbook three-quarter view, against a matte navy brown textured muslin backdrop, sharp focus throughout, even professional studio lighting setup with soft main light and subtle fill, head-and-shoulders framing, crisp details captured with Canon EF 50mm f/1.8 STM at f/8 for maximum depth of field, uniform illumination, professional studio strobe lighting, clean and formal composition, diploma holder optional, classic yearbook portrait style --v 6.0`,
           image_size: "landscape_4_3",
+          seed: 922220,
+          loras: [
+            {
+              path: "https://storage.googleapis.com/fal-flux-lora/7816b9bbfac24f29a2ef339ac8e41351_pytorch_lora_weights.safetensors",
+              scale: 1,
+            },
+          ],
         },
         logs: true,
         onQueueUpdate: (update) => {
