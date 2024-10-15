@@ -1,6 +1,6 @@
 "use client";
 import React, { useEffect, useState } from "react";
-import { auth } from "@/lib/firebase";
+import { auth, db } from "@/lib/firebase";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -24,6 +24,7 @@ import {
 import { Loader2, Upload, Download } from "lucide-react";
 import Image from "next/image";
 import * as fal from "@fal-ai/serverless-client";
+import { doc, updateDoc, arrayUnion } from "firebase/firestore";
 
 // Configure fal client with the API key
 fal.config({
@@ -75,6 +76,10 @@ export default function Dashboard() {
     }
   };
 
+  const handleGalleryClick = () => {
+    router.push("/gallery");
+  };
+
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files) {
       setFiles(e.target.files);
@@ -111,7 +116,21 @@ export default function Dashboard() {
       })) as any;
 
       if ((result as any).images && (result as any).images.length > 0) {
-        setGeneratedImageUrl((result as any).images[0].url);
+        const imageUrl = (result as any).images[0].url;
+        setGeneratedImageUrl(imageUrl);
+
+        // Store the generated image URL in Firestore
+        if (user) {
+          const userRef = doc(db, "users", user.uid);
+          await updateDoc(userRef, {
+            generatedImages: arrayUnion({
+              url: imageUrl,
+              createdAt: new Date().toISOString(),
+              university: university,
+              gender: gender,
+            }),
+          });
+        }
       } else {
         console.error("No image generated");
       }
@@ -139,21 +158,31 @@ export default function Dashboard() {
   return (
     <div className="min-h-screen bg-gradient-to-b from-purple-100 to-pink-100">
       <header className="p-4 bg-white shadow-sm flex justify-between items-center">
-        <h1 className="text-2xl font-bold text-purple-600">AI Grad Photos</h1>
-        <div className="flex items-center">
-          <span className="mr-4">Hi, {user.displayName}</span>
-          {user.photoURL && (
+        <div className="flex items-center space-x-4">
+          <h1 className="text-2xl font-bold text-purple-600">AI Grad Photos</h1>
+          <Button
+            onClick={handleGalleryClick}
+            className="bg-purple-600 hover:bg-purple-700 text-white"
+          >
+            Gallery
+          </Button>
+        </div>
+        <div className="flex items-center space-x-4">
+          {user && user.photoURL && (
             <Image
               src={user.photoURL}
               alt="Profile"
-              width={40}
-              height={40}
+              width={32}
+              height={32}
               className="rounded-full"
             />
           )}
+          <span className="text-gray-700">
+            Hi, {user?.displayName || "User"}
+          </span>
           <Button
             onClick={handleSignOut}
-            className="ml-4 bg-purple-600 hover:bg-purple-700 text-white"
+            className="bg-purple-600 hover:bg-purple-700 text-white"
           >
             Sign Out
           </Button>

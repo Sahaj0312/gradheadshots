@@ -14,9 +14,9 @@ export default function Home() {
       <FirebaseInit />
       <header className="p-4 bg-white shadow-sm flex justify-between items-center">
         <h1 className="text-2xl font-bold text-purple-600">AI Grad Photos</h1>
-        <Button className="bg-purple-600 hover:bg-purple-700 text-white">
+        {/* <Button className="bg-purple-600 hover:bg-purple-700 text-white">
           Login
-        </Button>
+        </Button> */}
       </header>
 
       <main className="container mx-auto px-4 py-8">
