@@ -25,6 +25,7 @@ import { Loader2, Upload, Download } from "lucide-react";
 import Image from "next/image";
 import * as fal from "@fal-ai/serverless-client";
 import { doc, updateDoc, arrayUnion } from "firebase/firestore";
+import StyleSelector from "@/components/StyleSelector";
 
 // Configure fal client with the API key
 fal.config({
@@ -54,6 +55,7 @@ export default function Dashboard() {
   const [gender, setGender] = useState("");
   const [isGenerating, setIsGenerating] = useState(false);
   const [generatedImageUrl, setGeneratedImageUrl] = useState("");
+  const [selectedStyle, setSelectedStyle] = useState<number | null>(null);
 
   useEffect(() => {
     const unsubscribe = auth.onAuthStateChanged((user) => {
@@ -93,11 +95,31 @@ export default function Dashboard() {
       const sashColor =
         universitySashColors[university as keyof typeof universitySashColors] ||
         "yellow";
+
+      let prompt = "";
+      switch (selectedStyle) {
+        case 1: // Outdoor
+          prompt = `Beautiful graduation photography, a confident ${
+            gender === "female" ? "female" : "male"
+          } graduate directly facing the camera with a genuine warm smile, wearing a traditional graduation cap with tassel and flowing black academic gown and a ${sashColor} sash, posed naturally in an outdoor campus setting with iconic university buildings in the background, bathed in soft natural lighting during golden hour, sharp focus throughout, captured with a Nikon AF-S DX NIKKOR 35mm f/1.8G lens at f/4 for a slightly shallow depth of field, wide-angle composition showcasing both the graduate and the scenic backdrop, crisp details and vibrant colors, diploma holder optional, modern and fresh outdoor portrait style --v 6.0`;
+          break;
+        case 2: // Classic
+          prompt = `Portrait of a confident ${
+            gender === "female" ? "female" : "male"
+          } graduate, directly facing camera with a genuine warm smile, wearing traditional blue graduation cap with tassel and flowing black academic gown and a ${sashColor} sash, posed in classic yearbook three-quarter view, against a matte navy brown textured muslin backdrop, sharp focus throughout, even professional studio lighting setup with soft main light and subtle fill, head-and-shoulders framing, crisp details captured with Canon EF 50mm f/1.8 STM at f/8 for maximum depth of field, uniform illumination, professional studio strobe lighting, clean and formal composition, diploma holder optional, classic yearbook portrait style --v 6.0`;
+          break;
+        case 3: // Library
+          prompt = `Beautiful graduation photography, a confident ${
+            gender === "female" ? "female" : "male"
+          } graduate directly facing the camera with a genuine warm smile, wearing a traditional graduation cap with tassel and flowing black academic gown and a ${sashColor} sash, posed naturally in a grand, majestic library setting with towering bookshelves and ornate architecture as the backdrop, illuminated by a mix of soft natural light from tall windows and warm interior lighting, sharp focus throughout, captured with a Nikon AF-S DX NIKKOR 35mm f/1.8G lens at f/5.6 for balanced depth of field, wide-angle composition showcasing both the graduate and the impressive library interior, crisp details and rich, warm tones, diploma holder optional, elegant and scholarly portrait style --v 6.0`;
+          break;
+        default:
+          throw new Error("Invalid style selected");
+      }
+
       const result = (await fal.subscribe("fal-ai/flux-lora", {
         input: {
-          prompt: `Portrait of a confident ${
-            gender === "female" ? "female" : "male"
-          } graduate, directly facing camera with a genuine warm smile, wearing traditional blue graduation cap with tassel and flowing black academic gown and a ${sashColor} sash, posed in classic yearbook three-quarter view, against a matte navy brown textured muslin backdrop, sharp focus throughout, even professional studio lighting setup with soft main light and subtle fill, head-and-shoulders framing, crisp details captured with Canon EF 50mm f/1.8 STM at f/8 for maximum depth of field, uniform illumination, professional studio strobe lighting, clean and formal composition, diploma holder optional, classic yearbook portrait style --v 6.0`,
+          prompt: prompt,
           image_size: "landscape_4_3",
           seed: 922220,
           loras: [
@@ -143,8 +165,8 @@ export default function Dashboard() {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (step === 2) {
-      setStep(3);
+    if (step === 3) {
+      setStep(4);
       generateImage();
     } else {
       setStep(step + 1);
@@ -227,13 +249,19 @@ export default function Dashboard() {
                 </div>
               )}
               {step === 2 && (
+                <StyleSelector
+                  selectedStyle={selectedStyle}
+                  setSelectedStyle={setSelectedStyle}
+                />
+              )}
+              {step === 3 && (
                 <div className="space-y-6">
                   <div className="space-y-2">
                     <Label
                       htmlFor="university"
                       className="text-gray-700 font-semibold"
                     >
-                      Step 2: Select your university
+                      Step 3: Select your university
                     </Label>
                     <Select value={university} onValueChange={setUniversity}>
                       <SelectTrigger
@@ -320,10 +348,10 @@ export default function Dashboard() {
                   </div>
                 </div>
               )}
-              {step === 3 && (
+              {step === 4 && (
                 <div className="space-y-4">
                   <Label className="text-gray-700 font-semibold">
-                    Step 3: Generated Picture
+                    Step 4: Generated Picture
                   </Label>
                   {isGenerating ? (
                     <div className="flex items-center justify-center h-40">
@@ -357,17 +385,18 @@ export default function Dashboard() {
             </form>
           </CardContent>
           <CardFooter className="bg-gray-50 p-6">
-            {step < 3 && (
+            {step < 4 && (
               <Button
                 type="submit"
                 onClick={handleSubmit}
                 className="w-full bg-purple-600 hover:bg-purple-700 text-white"
                 disabled={
                   (step === 1 && !files) ||
-                  (step === 2 && (!university || !gender))
+                  (step === 2 && !selectedStyle) ||
+                  (step === 3 && (!university || !gender))
                 }
               >
-                {step === 2 ? "Generate Pictures" : "Next Step"}
+                {step === 3 ? "Generate Pictures" : "Next Step"}
               </Button>
             )}
           </CardFooter>
