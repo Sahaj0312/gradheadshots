@@ -101,7 +101,7 @@ export default function Dashboard() {
         case 1: // Outdoor
           prompt = `Beautiful graduation photography, a confident ${
             gender === "female" ? "female" : "male"
-          } graduate directly facing the camera with a genuine warm smile, wearing a traditional graduation cap with tassel and flowing black academic gown and a ${sashColor} sash, posed naturally in an outdoor campus setting with iconic university buildings in the background, bathed in soft natural lighting during golden hour, sharp focus throughout, captured with a Nikon AF-S DX NIKKOR 35mm f/1.8G lens at f/4 for a slightly shallow depth of field, wide-angle composition showcasing both the graduate and the scenic backdrop, crisp details and vibrant colors, diploma holder optional, modern and fresh outdoor portrait style --v 6.0`;
+          } graduate directly facing the camera with a genuine warm smile, wearing a traditional graduation cap with tassel and flowing black academic gown, posed naturally in an outdoor campus setting with iconic university buildings in the background, bathed in soft natural lighting during golden hour, sharp focus throughout, captured with a Nikon AF-S DX NIKKOR 35mm f/1.8G lens at f/4 for a slightly shallow depth of field, wide-angle composition showcasing both the graduate and the scenic backdrop, crisp details and vibrant colors, diploma holder optional, modern and fresh outdoor portrait style --v 6.0`;
           break;
         case 2: // Classic
           prompt = `Portrait of a confident ${
@@ -111,7 +111,7 @@ export default function Dashboard() {
         case 3: // Library
           prompt = `Beautiful graduation photography, a confident ${
             gender === "female" ? "female" : "male"
-          } graduate directly facing the camera with a genuine warm smile, wearing a traditional graduation cap with tassel and flowing black academic gown and a ${sashColor} sash, posed naturally in a grand, majestic library setting with towering bookshelves and ornate architecture as the backdrop, illuminated by a mix of soft natural light from tall windows and warm interior lighting, sharp focus throughout, captured with a Nikon AF-S DX NIKKOR 35mm f/1.8G lens at f/5.6 for balanced depth of field, wide-angle composition showcasing both the graduate and the impressive library interior, crisp details and rich, warm tones, diploma holder optional, elegant and scholarly portrait style --v 6.0`;
+          } graduate directly facing the camera with a genuine warm smile, wearing a traditional graduation cap with tassel and flowing black academic gown, posed naturally in a grand, majestic library setting with towering bookshelves and ornate architecture as the backdrop, illuminated by a mix of soft natural light from tall windows and warm interior lighting, sharp focus throughout, captured with a Nikon AF-S DX NIKKOR 35mm f/1.8G lens at f/5.6 for balanced depth of field, wide-angle composition showcasing both the graduate and the impressive library interior, crisp details and rich, warm tones, diploma holder optional, elegant and scholarly portrait style --v 6.0`;
           break;
         default:
           throw new Error("Invalid style selected");
