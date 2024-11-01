@@ -1,11 +1,13 @@
 "use client";
-import React, { useEffect, useState } from "react";
+
+import { useEffect, useState } from "react";
 import { auth, db } from "@/lib/firebase";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import Image from "next/image";
 import { doc, getDoc } from "firebase/firestore";
+import Image from "next/image";
+import { Download } from "lucide-react";
+import Link from "next/link";
 
 interface GeneratedImage {
   url: string;
@@ -51,50 +53,79 @@ export default function Gallery() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-purple-100 to-pink-100">
-      <header className="p-4 bg-white shadow-sm flex justify-between items-center">
-        <h1 className="text-2xl font-bold text-purple-600">
-          AI Grad Photos Gallery
-        </h1>
-        <Button
-          onClick={handleBackToDashboard}
-          className="bg-purple-600 hover:bg-purple-700 text-white"
-        >
-          Back to Dashboard
-        </Button>
+    <div className="min-h-screen bg-white">
+      <header className="flex items-center justify-between px-4 py-4 md:px-6">
+        <Link href="/" className="text-2xl font-bold text-orange-400">
+          InstaGrad
+        </Link>
+        <div className="flex gap-4">
+          <Button
+            onClick={handleBackToDashboard}
+            className="h-12 gap-2 rounded-full bg-blue-100 px-6 text-blue-900 hover:bg-blue-200"
+          >
+            Back to Dashboard
+          </Button>
+          <Button variant="outline" onClick={() => auth.signOut()}>
+            Sign Out
+          </Button>
+        </div>
       </header>
 
       <main className="container mx-auto px-4 py-8">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {images.map((image, index) => (
-            <Card key={index} className="overflow-hidden">
-              <CardHeader>
-                <CardTitle className="text-lg">
-                  Generated Image {index + 1}
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="relative w-full h-64 mb-4">
+        <h1 className="mb-8 text-4xl font-bold tracking-tighter">
+          Your Generated Photos
+        </h1>
+
+        {images.length === 0 ? (
+          <div className="text-center py-12">
+            <p className="text-gray-600 mb-4">No generated photos yet.</p>
+            <Button
+              onClick={handleBackToDashboard}
+              className="h-12 gap-2 rounded-full bg-blue-100 px-6 text-blue-900 hover:bg-blue-200"
+            >
+              Create Your First Photo
+            </Button>
+          </div>
+        ) : (
+          <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+            {images.map((image, index) => (
+              <div
+                key={index}
+                className="overflow-hidden rounded-lg border border-gray-200 bg-white shadow-sm"
+              >
+                <div className="relative aspect-square">
                   <Image
                     src={image.url}
-                    alt={`Generated Image ${index + 1}`}
-                    layout="fill"
-                    objectFit="cover"
-                    className="rounded-lg"
+                    alt={`Generated graduation photo ${index + 1}`}
+                    fill
+                    className="object-cover"
                   />
                 </div>
-                <p className="text-sm text-gray-600">
-                  University: {image.university}
-                </p>
-                <p className="text-sm text-gray-600">Gender: {image.gender}</p>
-                <p className="text-sm text-gray-600">
-                  Created: {new Date(image.createdAt).toLocaleString()}
-                </p>
-              </CardContent>
-            </Card>
-          ))}
-        </div>
+                <div className="p-4">
+                  <div className="mb-4 text-sm text-gray-600">
+                    Created: {new Date(image.createdAt).toLocaleDateString()}
+                  </div>
+                  <Button
+                    onClick={() => window.open(image.url, "_blank")}
+                    className="w-full h-12 gap-2 rounded-full bg-blue-100 px-6 text-blue-900 hover:bg-blue-200"
+                  >
+                    <Download className="h-5 w-5" />
+                    Download
+                  </Button>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
       </main>
+
+      <footer className="px-4 py-8 md:px-6">
+        <div className="mx-auto max-w-6xl">
+          <p className="text-center text-gray-600">
+            &copy; 2024 InstaGrad. All rights reserved.
+          </p>
+        </div>
+      </footer>
     </div>
   );
 }

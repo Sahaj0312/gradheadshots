@@ -26,6 +26,7 @@ import Image from "next/image";
 import * as fal from "@fal-ai/serverless-client";
 import { doc, updateDoc, arrayUnion } from "firebase/firestore";
 import StyleSelector from "@/components/StyleSelector";
+import Link from "next/link";
 
 // Configure fal client with the API key
 fal.config({
@@ -178,19 +179,23 @@ export default function Dashboard() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-purple-100 to-pink-100">
-      <header className="p-4 bg-white shadow-sm flex justify-between items-center">
-        <div className="flex items-center space-x-4">
-          <h1 className="text-2xl font-bold text-purple-600">AI Grad Photos</h1>
+    <div className="min-h-screen bg-white">
+      {/* Header */}
+      <header className="flex items-center justify-between px-4 py-4 md:px-6">
+        <Link href="/" className="text-2xl font-bold text-orange-400">
+          InstaGrad
+        </Link>
+        <nav className="hidden space-x-6 md:flex">
           <Button
             onClick={handleGalleryClick}
-            className="bg-purple-600 hover:bg-purple-700 text-white"
+            variant="ghost"
+            className="text-gray-600 hover:text-gray-900"
           >
             Gallery
           </Button>
-        </div>
+        </nav>
         <div className="flex items-center space-x-4">
-          {user && user.photoURL && (
+          {user.photoURL && (
             <Image
               src={user.photoURL}
               alt="Profile"
@@ -202,209 +207,221 @@ export default function Dashboard() {
           <span className="text-gray-700">
             Hi, {user?.displayName || "User"}
           </span>
-          <Button
-            onClick={handleSignOut}
-            className="bg-purple-600 hover:bg-purple-700 text-white"
-          >
+          <Button onClick={handleSignOut} variant="outline">
             Sign Out
           </Button>
         </div>
       </header>
 
-      <main className="container mx-auto px-4 py-8">
-        <h2 className="text-3xl font-bold mb-6 text-gray-800 text-center">
-          Welcome to Your Dashboard
-        </h2>
-        <Card className="w-full max-w-md mx-auto bg-white shadow-lg rounded-lg overflow-hidden">
-          <CardHeader className="bg-purple-600 text-white">
-            <CardTitle className="text-2xl">
-              Generate Your Grad Photos
-            </CardTitle>
-            <CardDescription className="text-purple-100">
-              Complete the steps to generate your pictures
-            </CardDescription>
-          </CardHeader>
-          <CardContent className="p-6">
-            <form onSubmit={handleSubmit}>
-              {step === 1 && (
-                <div className="space-y-4">
-                  <Label
-                    htmlFor="picture"
-                    className="text-gray-700 font-semibold"
-                  >
-                    Step 1: Upload pictures of yourself
-                  </Label>
-                  <Input
-                    id="picture"
-                    type="file"
-                    multiple
-                    onChange={handleFileChange}
-                    className="cursor-pointer border-2 border-dashed border-purple-300 rounded-lg p-4 text-gray-700"
+      <main className="px-4 py-12 md:px-6">
+        <div className="mx-auto max-w-6xl">
+          <Card className="p-6">
+            <CardHeader>
+              <CardTitle className="text-2xl font-bold">
+                Create Your Grad Photos
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <form onSubmit={handleSubmit} className="space-y-8">
+                {/* Step 1: Upload */}
+                {step === 1 && (
+                  <div className="space-y-4">
+                    <Label className="text-xl font-semibold">
+                      Step 1: Upload Your Photos
+                    </Label>
+                    <div className="rounded-lg border-2 border-dashed border-gray-300 p-6">
+                      <Input
+                        id="picture"
+                        type="file"
+                        multiple
+                        onChange={handleFileChange}
+                        className="hidden"
+                      />
+                      <label
+                        htmlFor="picture"
+                        className="flex flex-col items-center cursor-pointer"
+                      >
+                        <Upload className="h-12 w-12 text-gray-400 mb-4" />
+                        <span className="text-gray-600">
+                          Click to upload or drag and drop
+                        </span>
+                      </label>
+                    </div>
+                    {files && (
+                      <p className="text-sm text-gray-600">
+                        {files.length} file(s) selected
+                      </p>
+                    )}
+                  </div>
+                )}
+
+                {/* Rest of the steps remain the same */}
+                {step === 2 && (
+                  <StyleSelector
+                    selectedStyle={selectedStyle}
+                    setSelectedStyle={setSelectedStyle}
                   />
-                  {files && (
-                    <p className="text-sm text-gray-600">
-                      {files.length} file(s) selected
-                    </p>
-                  )}
-                </div>
-              )}
-              {step === 2 && (
-                <StyleSelector
-                  selectedStyle={selectedStyle}
-                  setSelectedStyle={setSelectedStyle}
-                />
-              )}
-              {step === 3 && (
-                <div className="space-y-6">
-                  <div className="space-y-2">
-                    <Label
-                      htmlFor="university"
-                      className="text-gray-700 font-semibold"
-                    >
-                      Step 3: Select your university
-                    </Label>
-                    <Select value={university} onValueChange={setUniversity}>
-                      <SelectTrigger
-                        id="university"
-                        className="border-purple-300"
+                )}
+                {step === 3 && (
+                  <div className="space-y-6">
+                    <div className="space-y-2">
+                      <Label
+                        htmlFor="university"
+                        className="text-gray-700 font-semibold"
                       >
-                        <SelectValue placeholder="Select a university" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="university_of_toronto">
-                          University of Toronto
-                        </SelectItem>
-                        <SelectItem value="university_of_british_columbia">
-                          University of British Columbia
-                        </SelectItem>
-                        <SelectItem value="mcgill_university">
-                          McGill University
-                        </SelectItem>
-                        <SelectItem value="university_of_waterloo">
-                          University of Waterloo
-                        </SelectItem>
-                        <SelectItem value="university_of_alberta">
-                          University of Alberta
-                        </SelectItem>
-                        <SelectItem value="mcmaster_university">
-                          McMaster University
-                        </SelectItem>
-                        <SelectItem value="university_of_montreal">
-                          University of Montreal
-                        </SelectItem>
-                        <SelectItem value="queens_university">
-                          Queen's University
-                        </SelectItem>
-                        <SelectItem value="simon_fraser_university">
-                          Simon Fraser University
-                        </SelectItem>
-                        <SelectItem value="western_university">
-                          Western University
-                        </SelectItem>
-                        <SelectItem value="other">Other</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-                  <div className="space-y-2">
-                    <Label className="text-gray-700 font-semibold">
-                      Select your gender
-                    </Label>
-                    <RadioGroup
-                      value={gender}
-                      onValueChange={setGender}
-                      className="flex space-x-4"
-                    >
-                      <div className="flex items-center space-x-2">
-                        <RadioGroupItem
-                          value="male"
-                          id="male"
-                          className="text-purple-600"
-                        />
-                        <Label htmlFor="male" className="text-gray-700">
-                          Male
-                        </Label>
-                      </div>
-                      <div className="flex items-center space-x-2">
-                        <RadioGroupItem
-                          value="female"
-                          id="female"
-                          className="text-purple-600"
-                        />
-                        <Label htmlFor="female" className="text-gray-700">
-                          Female
-                        </Label>
-                      </div>
-                      <div className="flex items-center space-x-2">
-                        <RadioGroupItem
-                          value="other"
-                          id="other"
-                          className="text-purple-600"
-                        />
-                        <Label htmlFor="other" className="text-gray-700">
-                          Other
-                        </Label>
-                      </div>
-                    </RadioGroup>
-                  </div>
-                </div>
-              )}
-              {step === 4 && (
-                <div className="space-y-4">
-                  <Label className="text-gray-700 font-semibold">
-                    Step 4: Generated Picture
-                  </Label>
-                  {isGenerating ? (
-                    <div className="flex items-center justify-center h-40">
-                      <Loader2 className="h-8 w-8 animate-spin text-purple-600" />
+                        Step 3: Select your university
+                      </Label>
+                      <Select value={university} onValueChange={setUniversity}>
+                        <SelectTrigger
+                          id="university"
+                          className="border-purple-300"
+                        >
+                          <SelectValue placeholder="Select a university" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="university_of_toronto">
+                            University of Toronto
+                          </SelectItem>
+                          <SelectItem value="university_of_british_columbia">
+                            University of British Columbia
+                          </SelectItem>
+                          <SelectItem value="mcgill_university">
+                            McGill University
+                          </SelectItem>
+                          <SelectItem value="university_of_waterloo">
+                            University of Waterloo
+                          </SelectItem>
+                          <SelectItem value="university_of_alberta">
+                            University of Alberta
+                          </SelectItem>
+                          <SelectItem value="mcmaster_university">
+                            McMaster University
+                          </SelectItem>
+                          <SelectItem value="university_of_montreal">
+                            University of Montreal
+                          </SelectItem>
+                          <SelectItem value="queens_university">
+                            Queen's University
+                          </SelectItem>
+                          <SelectItem value="simon_fraser_university">
+                            Simon Fraser University
+                          </SelectItem>
+                          <SelectItem value="western_university">
+                            Western University
+                          </SelectItem>
+                          <SelectItem value="other">Other</SelectItem>
+                        </SelectContent>
+                      </Select>
                     </div>
-                  ) : (
-                    <div className="space-y-4">
-                      {generatedImageUrl && (
-                        <div className="relative w-full h-64">
-                          <Image
-                            src={generatedImageUrl}
-                            alt="Generated"
-                            layout="fill"
-                            objectFit="cover"
-                            className="rounded-lg"
+                    <div className="space-y-2">
+                      <Label className="text-gray-700 font-semibold">
+                        Select your gender
+                      </Label>
+                      <RadioGroup
+                        value={gender}
+                        onValueChange={setGender}
+                        className="flex space-x-4"
+                      >
+                        <div className="flex items-center space-x-2">
+                          <RadioGroupItem
+                            value="male"
+                            id="male"
+                            className="text-purple-600"
                           />
+                          <Label htmlFor="male" className="text-gray-700">
+                            Male
+                          </Label>
                         </div>
-                      )}
-                      <Button
-                        className="w-full bg-purple-600 hover:bg-purple-700 text-white"
-                        onClick={() => window.open(generatedImageUrl, "_blank")}
-                        disabled={!generatedImageUrl}
-                      >
-                        <Download className="mr-2 h-4 w-4" /> Download Generated
-                        Picture
-                      </Button>
+                        <div className="flex items-center space-x-2">
+                          <RadioGroupItem
+                            value="female"
+                            id="female"
+                            className="text-purple-600"
+                          />
+                          <Label htmlFor="female" className="text-gray-700">
+                            Female
+                          </Label>
+                        </div>
+                        <div className="flex items-center space-x-2">
+                          <RadioGroupItem
+                            value="other"
+                            id="other"
+                            className="text-purple-600"
+                          />
+                          <Label htmlFor="other" className="text-gray-700">
+                            Other
+                          </Label>
+                        </div>
+                      </RadioGroup>
                     </div>
+                  </div>
+                )}
+                {step === 4 && (
+                  <div className="space-y-4">
+                    <Label className="text-gray-700 font-semibold">
+                      Step 4: Generated Picture
+                    </Label>
+                    {isGenerating ? (
+                      <div className="flex items-center justify-center h-40">
+                        <Loader2 className="h-8 w-8 animate-spin text-purple-600" />
+                      </div>
+                    ) : (
+                      <div className="space-y-4">
+                        {generatedImageUrl && (
+                          <div className="overflow-hidden rounded-lg border border-gray-200 bg-white shadow-sm max-w-md mx-auto">
+                            <div className="relative aspect-square">
+                              <Image
+                                src={generatedImageUrl}
+                                alt="Generated graduation photo"
+                                fill
+                                className="object-cover"
+                              />
+                            </div>
+                            <div className="p-4">
+                              <Button
+                                onClick={() =>
+                                  window.open(generatedImageUrl, "_blank")
+                                }
+                                className="w-full h-12 gap-2 rounded-full bg-blue-100 px-6 text-blue-900 hover:bg-blue-200"
+                              >
+                                <Download className="h-5 w-5" />
+                                Download
+                              </Button>
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                    )}
+                  </div>
+                )}
+
+                <div className="flex justify-end">
+                  {step < 4 && (
+                    <Button
+                      type="submit"
+                      className="h-12 gap-2 rounded-full bg-blue-100 px-6 text-blue-900 hover:bg-blue-200"
+                      disabled={
+                        (step === 1 && !files) ||
+                        (step === 2 && !selectedStyle) ||
+                        (step === 3 && (!university || !gender))
+                      }
+                    >
+                      {step === 3 ? "Generate Photos" : "Next Step"}
+                    </Button>
                   )}
                 </div>
-              )}
-            </form>
-          </CardContent>
-          <CardFooter className="bg-gray-50 p-6">
-            {step < 4 && (
-              <Button
-                type="submit"
-                onClick={handleSubmit}
-                className="w-full bg-purple-600 hover:bg-purple-700 text-white"
-                disabled={
-                  (step === 1 && !files) ||
-                  (step === 2 && !selectedStyle) ||
-                  (step === 3 && (!university || !gender))
-                }
-              >
-                {step === 3 ? "Generate Pictures" : "Next Step"}
-              </Button>
-            )}
-          </CardFooter>
-        </Card>
+              </form>
+            </CardContent>
+          </Card>
+        </div>
       </main>
 
-      <footer className="mt-12 py-6 bg-gray-100 text-center text-gray-600">
-        <p>&copy; 2024 AI Grad Photos. All rights reserved.</p>
+      <footer className="px-4 py-8 md:px-6">
+        <div className="mx-auto max-w-6xl">
+          <p className="text-center text-gray-600">
+            &copy; 2024 InstaGrad. All rights reserved.
+          </p>
+        </div>
       </footer>
     </div>
   );
