@@ -2,15 +2,17 @@
 
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { ArrowRight, Play, Upload } from "lucide-react";
+import { ArrowRight, Play, Upload, Menu, ArrowDown } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { auth, googleProvider } from "@/lib/firebase";
 import { signInWithPopup } from "firebase/auth";
+import { useState } from "react";
 
 export function Page() {
   const router = useRouter();
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   const handleSignInClick = async () => {
     try {
@@ -44,28 +46,61 @@ export function Page() {
             Contact Us
           </Link>
         </nav>
-        <Button variant="outline" onClick={handleSignInClick}>
-          {auth.currentUser ? "Dashboard" : "Sign In"}
-        </Button>
+        <div className="flex items-center gap-4">
+          <Button variant="outline" onClick={handleSignInClick}>
+            {auth.currentUser ? "Dashboard" : "Sign In"}
+          </Button>
+          <Button
+            className="md:hidden"
+            variant="ghost"
+            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+          >
+            <Menu className="h-6 w-6" />
+          </Button>
+        </div>
       </header>
 
+      {/* Mobile Menu */}
+      {mobileMenuOpen && (
+        <div className="md:hidden px-4 py-2 space-y-2 bg-white border-t border-gray-100">
+          <Link
+            href="#how-it-works"
+            className="block py-2 text-gray-600 hover:text-gray-900"
+          >
+            How It Works
+          </Link>
+          <Link
+            href="#pricing"
+            className="block py-2 text-gray-600 hover:text-gray-900"
+          >
+            Pricing
+          </Link>
+          <Link
+            href="#contact"
+            className="block py-2 text-gray-600 hover:text-gray-900"
+          >
+            Contact Us
+          </Link>
+        </div>
+      )}
+
       {/* Hero Section */}
-      <section className="relative px-4 py-12 md:px-6">
+      <section className="relative px-4 py-8 md:py-12 md:px-6">
         <div className="mx-auto max-w-6xl">
-          <div className="grid gap-12 md:grid-cols-2">
-            <div className="space-y-6">
-              <h1 className="text-4xl font-bold tracking-tighter sm:text-5xl">
+          <div className="grid gap-8 md:gap-12 md:grid-cols-2">
+            <div className="space-y-4 md:space-y-6 text-center md:text-left">
+              <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold tracking-tighter">
                 Studio Photos Not Your Style?
                 <br />
                 Create Your Own Grad Magic
               </h1>
-              <p className="text-gray-600">
+              <p className="text-gray-600 text-sm md:text-base">
                 Turn your selfies into epic cap-and-gown portraits,
-                <br />
+                <br className="hidden md:block" />
                 or give your existing grad photos a cool video makeover!
               </p>
               <Button
-                className="h-12 gap-2 rounded-full bg-blue-100 px-6 text-blue-900 hover:bg-blue-200"
+                className="h-10 md:h-12 gap-2 rounded-full bg-blue-100 px-4 md:px-6 text-blue-900 hover:bg-blue-200 w-full md:w-auto"
                 onClick={handleSignInClick}
               >
                 <Upload className="h-5 w-5" />
@@ -73,30 +108,29 @@ export function Page() {
               </Button>
             </div>
             <div className="relative flex items-center justify-center">
-              <div className="flex items-center">
-                <div className="relative w-[300px] h-[300px]">
+              <div className="flex flex-col md:flex-row items-center gap-4 md:gap-6">
+                <div className="relative w-[200px] h-[200px] md:w-[300px] md:h-[300px]">
                   <Image
                     src="/images/photo_of_seenu_5 copy.jpg"
                     fill
                     alt="Before: Regular selfie"
                     className="rounded-full object-cover"
-                    style={{ objectFit: "cover" }}
                   />
                   <span className="absolute bottom-0 left-0 rounded-full bg-gray-800 px-2 py-1 text-xs text-white">
                     Before
                   </span>
                 </div>
-                <ArrowRight className="mx-6 h-10 w-10 text-orange-400" />
-                <div className="relative w-[300px] h-[300px]">
+                <ArrowRight className="hidden md:block mx-6 h-10 w-10 text-orange-400" />
+                <ArrowDown className="block md:hidden h-10 w-10 text-orange-400" />
+                <div className="relative w-[200px] h-[200px] md:w-[300px] md:h-[300px]">
                   <Image
                     src="/images/seenu_grad.jpg"
                     fill
                     alt="After: AI-generated graduation photo"
                     className="rounded-full object-cover"
-                    style={{ objectFit: "cover" }}
                   />
-                  <div className="absolute -right-4 -top-4 h-32 w-32 rounded-lg bg-purple-100">
-                    <Play className="m-auto h-8 w-8 text-purple-500" />
+                  <div className="absolute -right-2 -top-2 md:-right-4 md:-top-4 h-24 w-24 md:h-32 md:w-32 rounded-lg bg-purple-100">
+                    <Play className="m-auto h-6 w-6 md:h-8 md:w-8 text-purple-500" />
                   </div>
                   <span className="absolute bottom-0 right-0 rounded-full bg-gray-800 px-2 py-1 text-xs text-white">
                     After
@@ -109,14 +143,14 @@ export function Page() {
       </section>
 
       {/* AI Portraits Section */}
-      <section className="bg-blue-50 px-4 py-16 md:px-6">
+      <section className="bg-blue-50 px-4 py-12 md:py-16 md:px-6">
         <div className="mx-auto max-w-6xl">
-          <h2 className="mb-12 text-center text-3xl font-bold">
+          <h2 className="mb-8 md:mb-12 text-2xl md:text-3xl font-bold text-center">
             AI Graduation Portraits
           </h2>
-          <div className="grid gap-12 md:grid-cols-2">
-            <div className="grid grid-cols-2 gap-6">
-              <div className="relative h-[200px] w-[200px]">
+          <div className="grid gap-8 md:gap-12 md:grid-cols-2">
+            <div className="grid grid-cols-2 gap-4 md:gap-6 justify-items-center">
+              <div className="relative h-[150px] w-[150px] md:h-[200px] md:w-[200px]">
                 <Image
                   src="/images/classic.jpg"
                   fill
@@ -125,7 +159,7 @@ export function Page() {
                   style={{ objectFit: "cover" }}
                 />
               </div>
-              <div className="relative h-[200px] w-[200px]">
+              <div className="relative h-[150px] w-[150px] md:h-[200px] md:w-[200px]">
                 <Image
                   src="/images/library.jpg"
                   fill
@@ -134,7 +168,7 @@ export function Page() {
                   style={{ objectFit: "cover" }}
                 />
               </div>
-              <div className="relative h-[200px] w-[200px]">
+              <div className="relative h-[150px] w-[150px] md:h-[200px] md:w-[200px]">
                 <Image
                   src="/images/outdoor.jpg"
                   fill
@@ -143,7 +177,7 @@ export function Page() {
                   style={{ objectFit: "cover" }}
                 />
               </div>
-              <div className="relative h-[200px] w-[200px]">
+              <div className="relative h-[150px] w-[150px] md:h-[200px] md:w-[200px]">
                 <Image
                   src="/images/seenu_grad.jpg"
                   fill
@@ -153,8 +187,8 @@ export function Page() {
                 />
               </div>
             </div>
-            <div className="flex items-center">
-              <h3 className="text-2xl font-semibold">
+            <div className="flex items-center text-center md:text-left">
+              <h3 className="text-xl md:text-2xl font-semibold">
                 Turn your selfies into stunning cap-and-gown portraits in
                 seconds!
               </h3>

@@ -185,29 +185,17 @@ export default function Dashboard() {
         <Link href="/" className="text-2xl font-bold text-orange-400">
           InstaGrad
         </Link>
-        <nav className="hidden space-x-6 md:flex">
+        <div className="flex items-center gap-4">
+          <Link href="/gallery">
+            <Button variant="outline" className="h-10">
+              Gallery
+            </Button>
+          </Link>
           <Button
-            onClick={handleGalleryClick}
-            variant="ghost"
-            className="text-gray-600 hover:text-gray-900"
+            variant="outline"
+            onClick={() => auth.signOut()}
+            className="h-10"
           >
-            Gallery
-          </Button>
-        </nav>
-        <div className="flex items-center space-x-4">
-          {user.photoURL && (
-            <Image
-              src={user.photoURL}
-              alt="Profile"
-              width={32}
-              height={32}
-              className="rounded-full"
-            />
-          )}
-          <span className="text-gray-700">
-            Hi, {user?.displayName || "User"}
-          </span>
-          <Button onClick={handleSignOut} variant="outline">
             Sign Out
           </Button>
         </div>
